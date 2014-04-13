@@ -1,5 +1,5 @@
 import spyral
-import level
+import pong
 
 def main():
-    spyral.director.push(level.Pong())
+    spyral.director.push(pong.Pong())
