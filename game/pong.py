@@ -12,10 +12,10 @@ RED = (255, 0, 0)
 BLACKBLUE = (19, 15, 48)
 BG_COLOR = BLACKBLUE
 
-ENEMYGAP = 20
-XMARGIN = 50
-YMARGIN = 50
-MOVEX = 10
+ENEMYGAP = 30
+XMARGIN = 175
+YMARGIN = 100
+MOVEX = 15
 MOVEY = 20
 ENEMYSIDE = 50
 
@@ -25,30 +25,31 @@ class Alien(spyral.Sprite):
         super(Alien, self).__init__(scene)
         self.image = spyral.Image(size=(ENEMYSIDE, ENEMYSIDE)).fill(RED)
         self.anchor = 'topleft'
+        self.row = row
+        self.column = column
         self.x = (column * (ENEMYGAP + ENEMYSIDE)) + XMARGIN
         self.y = (row * (ENEMYGAP + ENEMYSIDE)) + YMARGIN
         self.name = 'enemy'
         self.vectorx = 1
-        self.time_offset = row * 300
-        self.move_time = 1000
-        self.timer = pg.time.get_ticks() - self.time_offset
+        self.time_offset = row * 3
+        self.move_time = 30
+        self.move_count = 0
+        self.timer = spyral.director.get_tick() - self.time_offset
 
-        spyral.event.register('director.update', self.update)
+        spyral.event.register('director.update', self.update_alien)
 
-    def update(self, delta):
-        current_time = pg.time.get_ticks()
-        print current_time - self.timer
+    def update_alien(self, delta):
+        current_time = spyral.director.get_tick()
+
         if (current_time - self.timer) > self.move_time:
-            print 'move'
-            self.x += MOVEX * self.vectorx
+            if self.move_count < 6:
+                self.x += MOVEX * self.vectorx
+                self.move_count += 1
+            elif self.move_count >= 6:
+                self.vectorx *= -1
+                self.move_count = 0
+                self.y += MOVEY
             self.timer = current_time
-
-        self.check_if_off_screen()
-
-    def check_if_off_screen(self):
-        if self.y < 0:
-            self.kill()
-
 
 
 
@@ -61,10 +62,17 @@ class Bullet(spyral.Sprite):
         self.y_vel = -900
         self.x = x
         self.y = y
-        spyral.event.register('director.update', self.update)
+        spyral.event.register('director.update', self.update_bullet)
 
-    def update(self, delta):
+    def update_bullet(self, delta):
         self.y += self.y_vel * delta
+
+        self.check_if_off_screen()
+
+    def check_if_off_screen(self):
+        if self.y < 0:
+            #self.kill()
+            pass
 
 
 class Player(spyral.Sprite):
@@ -121,7 +129,7 @@ class Player(spyral.Sprite):
         #self.pos == getattr(r, self.anchor)
 
 
-class Pong(spyral.Scene):
+class Level1(spyral.Scene):
     def __init__(self, *args, **kwargs):
         spyral.Scene.__init__(self, SIZE)
         self.background = spyral.Image(size=SIZE).fill(BG_COLOR)
@@ -137,7 +145,7 @@ class Pong(spyral.Scene):
         pass
 
     def make_enemies(self):
-        for column in range(5):
+        for column in range(10):
             for row in range(5):
                 Alien(self, row, column)
     
