@@ -76,11 +76,12 @@ class Bullet(spyral.Sprite):
 
 
 class Player(spyral.Sprite):
-    def __init__(self, scene, side):
+    def __init__(self, scene, side, collision_handler):
         super(Player, self).__init__(scene)
         width = 200
         height = 20
         self.game_scene = scene
+        self.collision_handler = collision_handler
         self.image = spyral.Image(size=(width, height)).fill(GREEN)
         self.anchor = 'midtop'
         self.x_vel = 0
@@ -109,7 +110,8 @@ class Player(spyral.Sprite):
 
     def shoot(self):
         if self.allow_shoot:
-            Bullet(self.game_scene, self.x, self.y)
+            bullet = Bullet(self.game_scene, self.x, self.y)
+            self.collision_handler.add_bullet(bullet)
             self.allow_shoot = False
 
     def reset_gun(self):
@@ -125,17 +127,60 @@ class Player(spyral.Sprite):
             self.rect.left = 0
         if self.rect.right > WIDTH:
             self.rect.right = WIDTH
-            
-        #self.pos == getattr(r, self.anchor)
+
+
+class CollisionHandler(object):
+    """
+    Handles collisions between bullets, aliens and blockers.
+    """
+    def __init__(self):
+        self.player = None
+        self.alien_list = []
+        self.bullet_list = []
+        spyral.event.register('director.update', self.update)
+
+    def update(self):
+        """
+        Check if there is a collision.
+        """
+        for alien in self.alien_list:
+            for bullet in self.bullet_list:
+                if bullet.collide_sprite(alien):
+                    bullet.kill()
+                    alien.kill()
+
+    def add_bullet(self, bullet):
+        """
+        Add bullet to bullet_list.
+        """
+        self.bullet_list.append(bullet)
+
+    def add_aliens(self, aliens):
+        """
+        Add alien to alien_list.
+        """
+        self.alien_list = aliens
+
+    def add_player(self, player):
+        """
+        Add player to handler.
+        """
+        self.player = player
+
+
+
 
 
 class Level1(spyral.Scene):
     def __init__(self, *args, **kwargs):
         spyral.Scene.__init__(self, SIZE)
         self.background = spyral.Image(size=SIZE).fill(BG_COLOR)
-        
-        self.player = Player(self, 'left')
-        self.make_enemies()
+
+        self.collision_handler = CollisionHandler()
+        self.player = Player(self, 'left', self.collision_handler)
+        self.alien_list = self.make_aliens(10, 5)
+        self.collision_handler.add_player(self.player)
+        self.collision_handler.add_aliens(self.alien_list)
 
         spyral.event.register("system.quit", spyral.director.pop)
         spyral.event.register("director.update", self.update)
@@ -144,8 +189,16 @@ class Level1(spyral.Scene):
     def update(self, delta):
         pass
 
-    def make_enemies(self):
-        for column in range(10):
-            for row in range(5):
-                Alien(self, row, column)
-    
+    def make_aliens(self, columns, rows):
+        """
+        Make aliens and send them to collision handler.
+        """
+        alien_list = []
+
+        for column in range(columns):
+            for row in range(rows):
+                alien = Alien(self, row, column)
+                alien_list.append(alien)
+
+        return alien_list
+
