@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2bee34f7-cabf-4a9e-9dfe-e7502b35da03" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/game/level.py" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/game/__init__.py" afterPath="$PROJECT_DIR$/game/__init__.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/game/pong.py" afterPath="$PROJECT_DIR$/game/pong.py" />
     </list>
     <ignored path="spaceinvaders-spyral.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -39,7 +37,7 @@
       <file leaf-file-name="pong.py" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/game/pong.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="27" column="12" selection-start="560" selection-end="566" vertical-scroll-proportion="0.86538464" vertical-offset="0" max-vertical-offset="1500">
+            <state line="39" column="39" selection-start="995" selection-end="995" vertical-scroll-proportion="0.60897434" vertical-offset="300" max-vertical-offset="2220">
               <folding>
                 <element signature="e#0#13#0" expanded="true" />
               </folding>
@@ -353,7 +351,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/game/pong.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="27" column="12" selection-start="560" selection-end="566" vertical-scroll-proportion="0.86538464" vertical-offset="0" max-vertical-offset="1500">
+        <state line="39" column="39" selection-start="995" selection-end="995" vertical-scroll-proportion="0.60897434" vertical-offset="300" max-vertical-offset="2220">
           <folding>
             <element signature="e#0#13#0" expanded="true" />
           </folding>

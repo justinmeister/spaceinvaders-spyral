@@ -1,13 +1,56 @@
 import spyral
+import pygame as pg
 import random
 import math
 
 WIDTH = 1200
 HEIGHT = 900
-BG_COLOR = (0,0,0)
 WHITE = (255, 255, 255)
 SIZE = (WIDTH, HEIGHT)
 GREEN = (60, 179, 113)
+RED = (255, 0, 0)
+BLACKBLUE = (19, 15, 48)
+BG_COLOR = BLACKBLUE
+
+ENEMYGAP = 20
+XMARGIN = 50
+YMARGIN = 50
+MOVEX = 10
+MOVEY = 20
+ENEMYSIDE = 50
+
+
+class Alien(spyral.Sprite):
+    def __init__(self, scene, row, column):
+        super(Alien, self).__init__(scene)
+        self.image = spyral.Image(size=(ENEMYSIDE, ENEMYSIDE)).fill(RED)
+        self.anchor = 'topleft'
+        self.x = (column * (ENEMYGAP + ENEMYSIDE)) + XMARGIN
+        self.y = (row * (ENEMYGAP + ENEMYSIDE)) + YMARGIN
+        self.name = 'enemy'
+        self.vectorx = 1
+        self.time_offset = row * 300
+        self.move_time = 1000
+        self.timer = pg.time.get_ticks() - self.time_offset
+
+        spyral.event.register('director.update', self.update)
+
+    def update(self, delta):
+        current_time = pg.time.get_ticks()
+        print current_time - self.timer
+        if (current_time - self.timer) > self.move_time:
+            print 'move'
+            self.x += MOVEX * self.vectorx
+            self.timer = current_time
+
+        self.check_if_off_screen()
+
+    def check_if_off_screen(self):
+        if self.y < 0:
+            self.kill()
+
+
+
 
 
 class Bullet(spyral.Sprite):
@@ -15,14 +58,13 @@ class Bullet(spyral.Sprite):
         super(Bullet, self).__init__(scene)
         self.image = spyral.Image(size=(5, 5)).fill(GREEN)
         self.anchor = 'midtop'
-        self.y_vel = -800
+        self.y_vel = -900
         self.x = x
         self.y = y
         spyral.event.register('director.update', self.update)
 
     def update(self, delta):
         self.y += self.y_vel * delta
-
 
 
 class Player(spyral.Sprite):
@@ -43,7 +85,7 @@ class Player(spyral.Sprite):
         spyral.event.register("input.keyboard.down.right", self.move_right)
         spyral.event.register("input.keyboard.down.left", self.move_left)
         spyral.event.register('input.keyboard.down.space', self.shoot)
-        spyral.event.register('input.keyboard.up.space', self.allow_shoot)
+        spyral.event.register('input.keyboard.up.space', self.reset_gun)
         spyral.event.register("input.keyboard.up.right", self.stop_move)
         spyral.event.register("input.keyboard.up.left", self.stop_move)
         spyral.event.register("director.update", self.update)
@@ -62,7 +104,7 @@ class Player(spyral.Sprite):
             Bullet(self.game_scene, self.x, self.y)
             self.allow_shoot = False
 
-    def allow_shoot(self):
+    def reset_gun(self):
         self.allow_shoot = True
 
     def _reset(self):
@@ -84,7 +126,8 @@ class Pong(spyral.Scene):
         spyral.Scene.__init__(self, SIZE)
         self.background = spyral.Image(size=SIZE).fill(BG_COLOR)
         
-        self.left_paddle = Player(self, 'left')
+        self.player = Player(self, 'left')
+        self.make_enemies()
 
         spyral.event.register("system.quit", spyral.director.pop)
         spyral.event.register("director.update", self.update)
@@ -92,4 +135,9 @@ class Pong(spyral.Scene):
         
     def update(self, delta):
         pass
+
+    def make_enemies(self):
+        for column in range(5):
+            for row in range(5):
+                Alien(self, row, column)
     
