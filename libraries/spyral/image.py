@@ -522,7 +522,6 @@ class Image(object):
         """
         subimage = _new_spyral_surface((width, height))
         subimage.blit(self._surf, (0, 0), (x, y, width, height))
-        subimage.set_colorkey((0, 0, 0))
 
         new_image = Image(size=(width, height))
         new_image._surf = subimage
