@@ -24,9 +24,9 @@ class Level1(spyral.Scene):
         spyral.Scene.__init__(self, SIZE)
         self.background = spyral.Image(size=SIZE).fill(BG_COLOR)
 
-        self.collision_handler = collision.CollisionHandler()
+        self.collision_handler = collision.CollisionHandler(self)
         self.player = sprite.Player(self, 'left', self.collision_handler)
-        self.alien_list = self.make_aliens(10, 5)
+        self.alien_list = self.make_aliens(6, 3)
         self.collision_handler.add_player(self.player)
         self.collision_handler.add_aliens(self.alien_list)
 

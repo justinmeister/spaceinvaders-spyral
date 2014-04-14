@@ -514,3 +514,18 @@ class Image(object):
             return spyral.Vec2D((w - w2) / 2., (h - h2) / 2.)
         else:
             return spyral.Vec2D(anchor_type) - spyral.Vec2D(w2, h2)
+
+
+    def get_subimage_by_pos(self, x, y, width, height):
+        """
+        Extract image from larger sheet.  Used for spritesheets.
+        """
+        subimage = _new_spyral_surface((width, height))
+        subimage.blit(self._surf, (0, 0), (x, y, width, height))
+        subimage.set_colorkey((0, 0, 0))
+
+        new_image = Image(size=(width, height))
+        new_image._surf = subimage
+
+        return new_image
+

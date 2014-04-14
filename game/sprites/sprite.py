@@ -1,4 +1,6 @@
+import os
 import spyral
+from spyral import Animation, easing
 
 WIDTH = 1200
 HEIGHT = 900
@@ -9,12 +11,17 @@ RED = (255, 0, 0)
 BLACKBLUE = (19, 15, 48)
 BG_COLOR = BLACKBLUE
 
-ENEMYGAP = 30
+ENEMYGAP = 85
 XMARGIN = 175
 YMARGIN = 100
 MOVEX = 15
 MOVEY = 20
 ENEMYSIDE = 50
+
+FILENAME = os.path.join("game", "graphics", "spritesheet.png")
+SPRITESHEET = spyral.Image(filename=FILENAME)
+EXPLOSION_FILENAME = os.path.join("game", "graphics", "explosion.png")
+BOOM_SPRITESHEET = spyral.Image(filename=EXPLOSION_FILENAME)
 
 
 class Alien(spyral.Sprite):
@@ -23,7 +30,7 @@ class Alien(spyral.Sprite):
     """
     def __init__(self, scene, row, column):
         super(Alien, self).__init__(scene)
-        self.image = spyral.Image(size=(ENEMYSIDE, ENEMYSIDE)).fill(RED)
+        self.image = SPRITESHEET.get_subimage_by_pos(222, 0, 102, 84)
         self.anchor = 'topleft'
         self.row = row
         self.column = column
@@ -52,14 +59,54 @@ class Alien(spyral.Sprite):
             self.timer = current_time
 
 
+class Explosion(spyral.Sprite):
+    """
+    Explosion when alien is hit by star.
+    """
+    def __init__(self, x, y, scene):
+        super(Explosion, self).__init__(scene)
+        self.x = x
+        self.y = y
+        self.image_list = self.make_image_list()
+        animation = Animation('image', easing.Iterate(self.image_list), duration=0.5)
+        self.animate(animation)
+
+        spyral.event.register('Explosion.image.animation.end', self.kill_sprite)
+
+    def make_image_list(self):
+        """
+        Make a list of images for animation.
+        """
+        image_list = []
+
+        for row in range(8):
+            for column in range(8):
+                x = column * 128
+                y = row * 128
+                width = height = 128
+                image_list.append(BOOM_SPRITESHEET.get_subimage_by_pos(
+                    x, y, width, height))
+
+        return image_list
+
+    def kill_sprite(self):
+        """
+        Remove explosion at end of animation.
+        """
+        self.kill()
+
+
+
+
+
 class Bullet(spyral.Sprite):
     """
     Projectile launched when player hits space.
     """
     def __init__(self, scene, x, y):
         super(Bullet, self).__init__(scene)
-        self.image = spyral.Image(size=(5, 5)).fill(GREEN)
-        self.anchor = 'midtop'
+        self.image = SPRITESHEET.get_subimage_by_pos(778, 557, 30, 30)
+        self.anchor = 'center'
         self.y_vel = -900
         self.x = x
         self.y = y
@@ -82,15 +129,13 @@ class Player(spyral.Sprite):
     """
     def __init__(self, scene, side, collision_handler):
         super(Player, self).__init__(scene)
-        width = 200
-        height = 20
         self.game_scene = scene
         self.collision_handler = collision_handler
-        self.image = spyral.Image(size=(width, height)).fill(GREEN)
+        self.image = SPRITESHEET.get_subimage_by_pos(325, 0, 98, 75)
         self.anchor = 'midtop'
         self.x_vel = 0
         self.x = WIDTH / 2
-        self.y = HEIGHT - 40
+        self.y = HEIGHT - 100
         self.side = side
         self.moving = False
         self.allow_shoot = True
