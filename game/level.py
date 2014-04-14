@@ -1,3 +1,4 @@
+import os
 import spyral
 from .sprites import sprite
 from . import collision
@@ -18,11 +19,14 @@ MOVEX = 15
 MOVEY = 20
 ENEMYSIDE = 50
 
+BACKGROUND = os.path.join("game", "graphics", "spacebackground.png")
+
 
 class Level1(spyral.Scene):
     def __init__(self):
         spyral.Scene.__init__(self, SIZE)
-        self.background = spyral.Image(size=SIZE).fill(BG_COLOR)
+        self.space = spyral.Image(filename=BACKGROUND)
+        self.background = self.space.scale((1200, 900))
 
         self.collision_handler = collision.CollisionHandler(self)
         self.player = sprite.Player(self, 'left', self.collision_handler)
