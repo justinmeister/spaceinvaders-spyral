@@ -308,7 +308,7 @@ class ButtonWidget(MultiStateWidget):
         pressed.
         """
         if event.key in (spyral.keys.enter, spyral.keys.space):
-            self.handle_mouse_down(event)
+            self._handle_mouse_down(event)
 
     def _handle_key_up(self, event):
         """
@@ -316,7 +316,7 @@ class ButtonWidget(MultiStateWidget):
         released.
         """
         if event.key in (spyral.keys.enter, spyral.keys.space):
-            self.handle_mouse_up(event)
+            self._handle_mouse_up(event)
 
     def __stylize__(self, properties):
         """
@@ -959,6 +959,11 @@ class _WidgetWrapper(object):
 
     def __call__(self, form, name):
         return self.cls(form, name, *self.args, **self.kwargs)
+    def __setattr__(self, item, value):
+        if item not in ('cls', 'args', 'kwargs'):
+            raise AttributeError("Can't set properties in the class definition of a Widget! Set outside of the declarative region. See http://platipy.org/en/latest/spyral_docs.html#spyral.Form")
+        else:
+            super(_WidgetWrapper, self).__setattr__(item, value)
 
 class module(types.ModuleType):
     def register(self, name, cls):
